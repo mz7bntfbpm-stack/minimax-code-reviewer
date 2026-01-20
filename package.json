@@ -1,0 +1,22 @@
+{
+  "name": "minimax-code-review-demo",
+  "version": "1.0.0",
+  "description": "Minimax Code Review Assistant - Interactive web tool for analyzing and optimizing Minimax-based applications",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo 'Static site - no build required'",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "minimax",
+    "code-review",
+    "developer-tools",
+    "ai"
+  ],
+  "author": "MiniMax Agent",
+  "license": "MIT",
+  "devDependencies": {
+    "playwright": "^1.57.0"
+  }
+}

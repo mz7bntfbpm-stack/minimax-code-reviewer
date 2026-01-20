@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimax Code Review Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script type='text/javascript' src='https://agent.minimax.io/Ap5rnQCvcJh2RfitxFLTJlvYe1Qr5BBvYXCVdywsCvrG5vCfXKD0mh7utDBBsF1pqAJUKTQ5KZuanDkgvtFJhkOX_hBa1VClv_vhNboyUAzEXfTcnbCoc6hMrwCzhyvHQED679q9nuoz1_jSXNnPU-n1A4iMCCgQE_LTpt0svyAWFgEK3L7tQn6XMa4ft2Hmw1Z6KUqRpddiZcPCc3drkXXXZsBdBap44u51E97gwRslDVXhbidKl9IQjmDaiWP-FM3QElXjk504O9zuhvm-u-6ORG9WD_7OlXcc__xeYeRloQCtlk48dephb_gmTjGPcu-W8zt86vI01IV1vNEEIv4cC2n1Sd8Ur_28RkNfOnWaXJKsU1UC_-r9wiMa-1ZzJhVXDkz0h2t_dCNK0g3V9w6J5h0jhIV7wIT7ZrrZpi9sYG8EGjpUhjKixhv1emsJ8UUgsAqEoz3jkH15FcMOQe6naabds9yxW77Js03wH_Kwdg-ewxSxp190ahj5EyLunPvMXkXsAeLDsWwSmpGoKSHZt8yVpEr6hHl2RDQSq3f22j6HTAON16Q7Z_VzCOOj'></script></head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="32" rx="8" fill="#238636"/>
+                        <path d="M8 16L14 22L24 10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="logo-text">Minimax Code Review</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="status-indicator" id="apiStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Bereit</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-secondary" id="historyBtn" aria-label="Verlauf anzeigen">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Verlauf
+                </button>
+                <button class="btn btn-secondary" id="settingsBtn" aria-label="Einstellungen öffnen">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                    </svg>
+                    Einstellungen
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel - Code Editor -->
+            <div class="panel left-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Code Eingabe</h2>
+                    <div class="panel-actions">
+                        <select id="languageSelect" class="select-input" aria-label="Programmiersprache auswählen">
+                            <option value="javascript">JavaScript</option>
+                            <option value="typescript">TypeScript</option>
+                            <option value="python">Python</option>
+                            <option value="go">Go</option>
+                            <option value="java">Java</option>
+                        </select>
+                        <button class="btn btn-secondary" id="clearBtn" aria-label="Code löschen">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                            </svg>
+                            Leeren
+                        </button>
+                        <button class="btn btn-secondary" id="loadSampleBtn" aria-label="Beispielcode laden">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                            </svg>
+                            Beispiel laden
+                        </button>
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <textarea id="codeEditor" class="code-editor" placeholder="// Fügen Sie hier Ihren Code ein oder laden Sie ein Beispiel..." aria-label="Code Editor"></textarea>
+                </div>
+                <div class="panel-footer">
+                    <div class="token-info">
+                        <span id="lineCount">0 Zeilen</span>
+                        <span class="separator">|</span>
+                        <span id="charCount">0 Zeichen</span>
+                    </div>
+                    <button class="btn btn-primary" id="analyzeBtn" aria-label="Code analysieren">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        Code analysieren
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Panel - Review Results -->
+            <div class="panel right-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Review Ergebnisse</h2>
+                    <div class="panel-actions">
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" data-filter="all" aria-label="Alle Probleme anzeigen">Alle</button>
+                            <button class="filter-tab critical" data-filter="critical" aria-label="Kritische Probleme anzeigen">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                Kritisch
+                            </button>
+                            <button class="filter-tab warning" data-filter="high" aria-label="Hohe Priorität Probleme anzeigen">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                                </svg>
+                                Hoch
+                            </button>
+                            <button class="filter-tab info" data-filter="medium" aria-label="Mittlere Priorität Probleme anzeigen">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                                </svg>
+                                Mittel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="results-container" id="resultsContainer">
+                    <div class="empty-state">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M9 12h6m-3-3v6m9 2V7a2 2 0 00-2-2h-4.586a1 1 0 01-.707-.293l-4.586-4.586a1 1 0 00-1.414 0L6.586 5A2 2 0 005 7v10a2 2 0 002 2h12a2 2 0 002-2z"/>
+                        </svg>
+                        <h3>Keine Analyse vorhanden</h3>
+                        <p>Fügen Sie Code ein und klicken Sie auf "Analysieren", um das Review zu starten.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Optimization Panel (Collapsible) -->
+        <div class="optimization-panel" id="optimizationPanel">
+            <div class="panel-header">
+                <h2 class="panel-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    Optimierter Code
+                </h2>
+                <button class="btn btn-secondary" id="closeOptimizationBtn" aria-label="Optimierungspanel schließen">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="optimization-content">
+                <div class="diff-container" id="diffContainer">
+                    <div class="diff-view">
+                        <div class="diff-header">
+                            <span>Original</span>
+                            <span>Optimiert</span>
+                        </div>
+                        <div class="diff-body" id="diffBody">
+                            <!-- Diff content will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="optimization-actions">
+                    <button class="btn btn-primary" id="copyOptimizedBtn" aria-label="Optimierten Code in Zwischenablage kopieren">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                        </svg>
+                        Optimierten Code kopieren
+                    </button>
+                    <button class="btn btn-secondary" id="applyFixesBtn" aria-label="Alle Fixes anwenden">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Alle Fixes anwenden
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Einstellungen</h2>
+                <button class="modal-close" id="closeSettingsBtn" aria-label="Einstellungen schließen">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <h3>API Konfiguration</h3>
+                    <div class="form-group">
+                        <label for="apiKeyInput">Minimax API Key</label>
+                        <input type="password" id="apiKeyInput" class="form-input" placeholder="Ihr API Key" aria-label="API Key eingeben">
+                    </div>
+                    <div class="form-group">
+                        <label for="modelSelect">Modell</label>
+                        <select id="modelSelect" class="form-input" aria-label="Modell auswählen">
+                            <option value="MiniMax-M2.1">MiniMax-M2.1</option>
+                            <option value="MiniMax-M2">MiniMax-M2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h3>Review Einstellungen</h3>
+                    <div class="form-group">
+                        <label>Review Kategorien</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="checkSecurity" checked aria-label="Security Checks aktivieren">
+                                <span>Security</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="checkPerformance" checked aria-label="Performance Checks aktivieren">
+                                <span>Performance</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="checkCodeQuality" checked aria-label="Code Qualität Checks aktivieren">
+                                <span>Code Qualität</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="checkMinimaxSpecific" checked aria-label="Minimax spezifische Checks aktivieren">
+                                <span>Minimax spezifisch</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelSettingsBtn" aria-label="Einstellungen abbrechen">Abbrechen</button>
+                <button class="btn btn-primary" id="saveSettingsBtn" aria-label="Einstellungen speichern">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal modal-large">
+            <div class="modal-header">
+                <h2>Verlauf</h2>
+                <button class="modal-close" id="closeHistoryBtn" aria-label="Verlauf schließen">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="history-list" id="historyList">
+                    <!-- History items will be inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="clearHistoryBtn" aria-label="Verlauf löschen">Verlauf löschen</button>
+                <button class="btn btn-primary" id="closeHistoryModalBtn" aria-label="Verlauf Modal schließen">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
